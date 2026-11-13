@@ -42,6 +42,8 @@ export interface Backend {
 
   signUp(email: string, password: string): Promise<{ needsEmailConfirm: boolean }>;
   signIn(email: string, password: string): Promise<void>;
+  /** 用 Google 帳號登入。正式後端會把整個頁面導向 Google，回來後由 onAuthChange 通知。 */
+  signInWithGoogle(): Promise<void>;
   signOut(): Promise<void>;
   sendPasswordReset(email: string): Promise<void>;
   updatePassword(password: string): Promise<void>;
@@ -66,6 +68,7 @@ export class NoneBackend implements Backend {
   onPasswordRecovery = () => () => {};
   signUp = unavailable;
   signIn = unavailable;
+  signInWithGoogle = unavailable;
   signOut = () => Promise.resolve();
   sendPasswordReset = unavailable;
   updatePassword = unavailable;

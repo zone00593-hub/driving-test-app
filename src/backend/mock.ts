@@ -94,6 +94,18 @@ export class MockBackend implements Backend {
     this.setSession({ id: acct.id, email: key });
   }
 
+  /** 模擬 Google 登入：直接以一個固定的 Google 帳號登入（第一次會自動建立）。 */
+  async signInWithGoogle() {
+    this.net();
+    const key = 'google.user@example.com';
+    const all = this.accounts();
+    if (!all[key]) {
+      all[key] = { id: `mock-google-${Object.keys(all).length + 1}`, password: '' };
+      this.write('mock:accounts', all);
+    }
+    this.setSession({ id: all[key].id, email: key });
+  }
+
   async signOut() {
     this.setSession(null);
   }

@@ -89,6 +89,20 @@ export class SupabaseBackend implements Backend {
     if (error) throw friendly(error);
   }
 
+  async signInWithGoogle() {
+    // 導向 Google 登入頁；回來時網址帶 ?code=，supabase-js 會自動換成登入狀態（PKCE）。
+    const { error } = await this.client.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: this.redirectUrl() },
+    });
+    if (error) {
+      const m = (error.message ?? '').toLowerCase();
+      if (m.includes('provider is not enabled') || m.includes('unsupported provider'))
+        throw new BackendError('這個網站還沒開啟 Google 登入，請先用 Email 登入。', error);
+      throw friendly(error);
+    }
+  }
+
   async signOut() {
     // scope: 'local' 只登出這台裝置，不影響其他裝置。
     const { error } = await this.client.auth.signOut({ scope: 'local' });

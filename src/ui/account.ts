@@ -82,6 +82,10 @@ export const accountView: View = (root, app) => {
             <button class="btn small ${mode === 'signin' ? 'on' : ''}" data-mode="signin" aria-pressed="${mode === 'signin' ? 'true' : 'false'}">登入</button>
             <button class="btn small ${mode === 'signup' ? 'on' : ''}" data-mode="signup" aria-pressed="${mode === 'signup' ? 'true' : 'false'}">註冊</button>
           </div>
+          ${mode !== 'forgot'
+            ? html`<button class="btn google" type="button" data-act="google" ${busy ? html`disabled` : ''}>使用 Google 帳號繼續</button>
+                <p class="divider"><span>或用 Email ${mode === 'signup' ? '註冊' : '登入'}</span></p>`
+            : ''}
           <form data-form="auth" novalidate>
             <label class="field"><span>Email</span><input type="email" name="email" autocomplete="email" inputmode="email" required /></label>
             ${mode !== 'forgot'
@@ -99,7 +103,7 @@ export const accountView: View = (root, app) => {
               ${mode === 'forgot' ? html`<button class="btn link" type="button" data-mode="signin">回到登入</button>` : ''}
             </div>
           </form>
-          <p class="muted small">不登入也可以完整使用。登入的好處是進度會同步到雲端，換裝置可以接著練。</p>
+          <p class="muted small">不登入也可以完整使用。登入的好處是進度會同步到雲端，換裝置可以接著練。第一次用 Google 登入會自動建立帳號。</p>
         </section>
         ${privacy}
       `,
@@ -196,6 +200,12 @@ export const accountView: View = (root, app) => {
       }
     });
   });
+
+  on(root, 'click', '[data-act="google"]', () =>
+    void run(async () => {
+      await app.backend.signInWithGoogle();
+    }),
+  );
 
   on(root, 'submit', '[data-form="newpw"]', (e, form) => {
     e.preventDefault();

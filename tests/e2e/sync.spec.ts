@@ -92,6 +92,12 @@ test.describe('帳號與同步（假後端）', () => {
     expect(left).toEqual([]);
   });
 
+  test('可以用 Google 帳號登入（假後端模擬）', async ({ page }) => {
+    await page.goto('/#/account');
+    await page.getByRole('button', { name: '使用 Google 帳號繼續' }).click();
+    await expect(page.getByTestId('email')).toHaveText('google.user@example.com');
+  });
+
   test('密碼錯誤會顯示看得懂的訊息', async ({ page }) => {
     const me = email('wrongpw');
     await signUp(page, me);
