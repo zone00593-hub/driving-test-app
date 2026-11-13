@@ -55,7 +55,7 @@ async function boot() {
       <footer class="foot">
         <p>
           題庫資料來源：交通部公路局《新版汽車筆試題庫》。本站為個人練習作品，非官方網站，內容以公路局與監理站公告為準。
-          <a href="#/about">關於本站</a>
+          <a href="#/about">關於本站</a>　<a href="./privacy.html">隱私權政策</a>
         </p>
       </footer>
     `,
