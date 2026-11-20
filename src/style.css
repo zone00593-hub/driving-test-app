@@ -772,3 +772,6 @@ th {
       width 0.3s;
   }
 }
+
+/* 只有觸控、沒有實體鍵盤的裝置不顯示鍵盤提示 */
+@media (hover: none) and (pointer: coarse) { .kbd-hint { display: none; } }

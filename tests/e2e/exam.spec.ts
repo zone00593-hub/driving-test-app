@@ -71,4 +71,26 @@ test.describe('模擬考', () => {
     await expect(page.getByTestId('verdict')).toHaveText('不及格', { timeout: 5000 });
     await expect(page.locator('.result')).toContainText('時間到，已自動交卷');
   });
+
+  test('鍵盤：選完答案後用方向鍵和 Enter 換題，不會改到答案', async ({ page }) => {
+    await page.goto('/#/exam');
+    await page.getByRole('button', { name: '開始作答' }).click();
+    const cur = () => page.evaluate(() => JSON.parse(sessionStorage.getItem('dt:exam')!).cur as number);
+
+    // 點選項後焦點留在 radio 上，這正是方向鍵原本會改答案的情況。
+    await page.locator('input[name="ans"][value="2"]').check();
+    await expect(page.locator('input[name="ans"][value="2"]')).toBeFocused();
+    await page.keyboard.press('ArrowRight');
+    await expect.poll(cur).toBe(1);
+    await page.keyboard.press('1');
+    await page.keyboard.press('Enter');
+    await expect.poll(cur).toBe(2);
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowLeft');
+    await expect.poll(cur).toBe(0);
+    await expect(page.locator('input[name="ans"][value="2"]')).toBeChecked();
+    await page.keyboard.press('ArrowLeft');
+    await expect.poll(cur).toBe(0);
+    await expect(page.getByTestId('answered')).toHaveText('2');
+  });
 });

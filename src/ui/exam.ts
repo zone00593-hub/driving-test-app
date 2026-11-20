@@ -182,6 +182,7 @@ export const examView: View = (root, app) => {
           <button class="btn" data-act="flag" aria-pressed="${r.flags[r.cur] ? 'true' : 'false'}">${r.flags[r.cur] ? '取消標記' : '標記待檢查'}</button>
           <button class="btn primary push-right" data-act="ask">交卷</button>
         </div>
+        <p class="muted small kbd-hint">鍵盤：1、2、3 作答，← → 上一題／下一題，Enter 下一題。</p>
 
         ${confirming
           ? html`<section class="card confirm" role="alertdialog" aria-labelledby="confirm-h">
@@ -338,15 +339,26 @@ export const examView: View = (root, app) => {
 
   const onKey = (e: KeyboardEvent) => {
     if (!run || e.metaKey || e.ctrlKey || e.altKey) return;
-    const tag = (e.target as HTMLElement | null)?.tagName;
+    const t = e.target as HTMLElement | null;
+    const tag = t?.tagName;
     if (tag === 'TEXTAREA' || tag === 'SELECT') return;
+    // 選項是 radio：焦點在選項上時，瀏覽器預設會用方向鍵換答案。這裡攔下來改成換題。
+    if (tag === 'INPUT' && (t as HTMLInputElement).type !== 'radio') return;
     if (['1', '2', '3'].includes(e.key)) {
       e.preventDefault();
       run.answers[run.cur] = Number(e.key) as Choice;
       save();
       render();
-    } else if (e.key === 'ArrowRight' && tag !== 'INPUT') move(run.cur + 1);
-    else if (e.key === 'ArrowLeft' && tag !== 'INPUT') move(run.cur - 1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      move(run.cur + 1);
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      move(run.cur - 1);
+    } else if (e.key === 'Enter' && tag !== 'BUTTON' && tag !== 'A') {
+      e.preventDefault();
+      move(run.cur + 1);
+    }
   };
   document.addEventListener('keydown', onKey);
 
